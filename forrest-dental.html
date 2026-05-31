@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ForREST — Стоматология</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #1d4a35;
+      --green-light: #2a6349;
+      --green-pale: #eaf1ec;
+      --black: #0a0a0a;
+      --gray-1: #1c1c1e;
+      --gray-2: #3a3a3c;
+      --gray-3: #6e6e73;
+      --gray-4: #aeaeb2;
+      --gray-5: #e5e5ea;
+      --gray-6: #f5f5f7;
+      --white: #ffffff;
+      --radius: 20px;
+      --radius-sm: 12px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body { font-family: var(--font); background: var(--white); color: var(--gray-1); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 64px;
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      transition: background .3s;
+    }
+    .nav-logo {
+      font-size: 20px; font-weight: 700; letter-spacing: -.5px;
+      color: var(--black); text-decoration: none;
+    }
+    .nav-logo span { color: var(--green); }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-size: 14px; font-weight: 500; color: var(--gray-2);
+      text-decoration: none; letter-spacing: -.1px;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--green); }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-cta {
+      background: var(--green); color: var(--white);
+      border: none; padding: 10px 20px; border-radius: 980px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      text-decoration: none; transition: background .2s, transform .15s;
+    }
+    .nav-cta:hover { background: var(--green-light); transform: scale(1.02); }
+
+    /* Burger */
+    .burger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .burger span {
+      display: block; width: 24px; height: 2px;
+      background: var(--black); border-radius: 2px;
+      transition: transform .3s, opacity .3s;
+    }
+    .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .burger.open span:nth-child(2) { opacity: 0; }
+    .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none; position: fixed; top: 64px; left: 0; right: 0;
+      background: rgba(255,255,255,.96); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--gray-5); z-index: 99;
+      flex-direction: column; padding: 24px 32px 32px;
+      gap: 0;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-size: 18px; font-weight: 500; color: var(--gray-1);
+      text-decoration: none; padding: 14px 0;
+      border-bottom: 1px solid var(--gray-5);
+      transition: color .2s;
+    }
+    .mobile-menu a:last-child { border-bottom: none; }
+    .mobile-menu a:hover { color: var(--green); }
+    .mobile-menu .mobile-cta {
+      margin-top: 20px; background: var(--green); color: var(--white);
+      text-align: center; padding: 16px; border-radius: 980px;
+      font-weight: 600; border: none;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      padding: 140px 24px 100px;
+      background: var(--white);
+      position: relative; overflow: hidden;
+    }
+    /* Subtle radial glow */
+    .hero::before {
+      content: '';
+      position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+      width: 1000px; height: 700px;
+      background: radial-gradient(ellipse at center, rgba(29,74,53,.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--green-pale); color: var(--green);
+      font-size: 13px; font-weight: 600; letter-spacing: .2px;
+      padding: 6px 14px; border-radius: 980px; margin-bottom: 28px;
+    }
+    .hero-badge::before { content: '●'; font-size: 8px; }
+    h1 {
+      font-size: clamp(48px, 8vw, 96px);
+      font-weight: 700; letter-spacing: -3px; line-height: 1.02;
+      color: var(--black); max-width: 14ch;
+    }
+    h1 em { color: var(--green); font-style: normal; }
+    .hero-sub {
+      margin-top: 24px; font-size: clamp(17px, 2vw, 21px);
+      color: var(--gray-3); max-width: 52ch; line-height: 1.5; font-weight: 400;
+    }
+    .hero-actions { display: flex; gap: 14px; margin-top: 40px; flex-wrap: wrap; justify-content: center; }
+    .btn-primary {
+      background: var(--green); color: var(--white);
+      padding: 17px 32px; border-radius: 980px; font-size: 17px;
+      font-weight: 600; text-decoration: none; border: none; cursor: pointer;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(29,74,53,.25);
+      font-family: var(--font);
+    }
+    .btn-primary:hover { background: var(--green-light); transform: scale(1.02); box-shadow: 0 6px 28px rgba(29,74,53,.35); }
+    .btn-secondary {
+      background: var(--gray-6); color: var(--black);
+      padding: 17px 32px; border-radius: 980px; font-size: 17px;
+      font-weight: 600; text-decoration: none; border: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+      font-family: var(--font);
+    }
+    .btn-secondary:hover { background: var(--gray-5); transform: scale(1.02); }
+
+    /* Stats */
+    .hero-stats {
+      display: flex; gap: 64px; margin-top: 72px;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .stat { text-align: center; }
+    .stat-number {
+      font-size: 48px; font-weight: 700; letter-spacing: -2px;
+      color: var(--black); line-height: 1;
+    }
+    .stat-number span { color: var(--green); }
+    .stat-label { font-size: 14px; color: var(--gray-3); margin-top: 6px; font-weight: 400; }
+
+    /* Hero video */
+    .hero-video-wrap {
+      width: 100%; max-width: 1100px; margin: 72px auto 0;
+      border-radius: var(--radius); overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,.15);
+      aspect-ratio: 16/9; position: relative; background: #000;
+    }
+    .hero-video-wrap video {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .hero-video-fade {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 35%;
+      background: linear-gradient(to top, rgba(255,255,255,1), transparent);
+      pointer-events: none;
+    }
+    #soundBtn {
+      position: absolute; top: 16px; right: 16px;
+      background: rgba(255,255,255,.75); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: none; border-radius: 980px; padding: 8px 16px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      font-family: var(--font); color: var(--gray-1);
+      transition: background .2s; z-index: 2;
+    }
+    #soundBtn:hover { background: rgba(255,255,255,.95); }
+
+    /* Hero visual card grid */
+    .hero-visual {
+      width: 100%; max-width: 1100px; margin: 72px auto 0;
+      display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px;
+      height: 340px;
+    }
+    .hero-card {
+      border-radius: var(--radius); overflow: hidden; position: relative;
+    }
+    .hero-card-main {
+      background: linear-gradient(135deg, #1d4a35 0%, #2e7d52 50%, #3a9464 100%);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 32px;
+    }
+    .hero-card-main::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-card-main h3 { font-size: 28px; font-weight: 700; color: #fff; letter-spacing: -1px; position: relative; }
+    .hero-card-main p { font-size: 14px; color: rgba(255,255,255,.7); margin-top: 6px; position: relative; }
+    .hero-card-top {
+      background: var(--green-pale);
+      display: flex; flex-direction: column; justify-content: center;
+      align-items: center; text-align: center; padding: 24px;
+    }
+    .hero-card-top .big-num { font-size: 52px; font-weight: 700; color: var(--green); letter-spacing: -2px; line-height: 1; }
+    .hero-card-top .big-label { font-size: 13px; color: var(--green-light); margin-top: 6px; font-weight: 500; }
+    .hero-card-bottom {
+      background: var(--gray-1);
+      display: flex; flex-direction: column; justify-content: center;
+      align-items: center; text-align: center; padding: 24px;
+    }
+    .hero-card-bottom .big-num { font-size: 52px; font-weight: 700; color: var(--white); letter-spacing: -2px; line-height: 1; }
+    .hero-card-bottom .big-label { font-size: 13px; color: var(--gray-4); margin-top: 6px; font-weight: 500; }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 120px 48px; }
+    .section-tag {
+      font-size: 13px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--green); margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(32px, 4vw, 52px); font-weight: 700;
+      letter-spacing: -2px; color: var(--black); line-height: 1.05;
+    }
+    .section-sub {
+      margin-top: 16px; font-size: 18px; color: var(--gray-3);
+      max-width: 54ch; line-height: 1.55;
+    }
+    .section-header { margin-bottom: 64px; }
+
+    /* ── ABOUT ── */
+    .about { background: var(--gray-6); }
+    .about-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .about-text p {
+      font-size: 18px; color: var(--gray-2); line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    /* About visual: decorative card */
+    .about-visual {
+      border-radius: var(--radius); overflow: hidden;
+      background: linear-gradient(145deg, #1d4a35, #2e7d52);
+      padding: 48px; display: flex; flex-direction: column;
+      justify-content: space-between; min-height: 400px;
+      position: relative;
+    }
+    .about-visual::after {
+      content: '🌿';
+      position: absolute; right: 32px; top: 32px; font-size: 80px;
+      opacity: .15;
+    }
+    .about-visual-quote {
+      font-size: 22px; font-weight: 600; color: #fff;
+      line-height: 1.4; max-width: 26ch;
+    }
+    .about-visual-stats { display: flex; gap: 32px; }
+    .about-vs { }
+    .about-vs-num { font-size: 36px; font-weight: 700; color: #fff; letter-spacing: -1.5px; }
+    .about-vs-label { font-size: 13px; color: rgba(255,255,255,.6); margin-top: 2px; }
+
+    /* ── SERVICES ── */
+    .services { background: var(--white); }
+    .services-inner { max-width: 1200px; margin: 0 auto; }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .service-card {
+      background: var(--gray-6); border-radius: var(--radius);
+      padding: 40px 36px; cursor: default;
+      transition: transform .25s, box-shadow .25s, background .25s;
+      position: relative; overflow: hidden;
+    }
+    .service-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      background: var(--green); transform: scaleX(0); transform-origin: left;
+      transition: transform .3s ease;
+    }
+    .service-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,.08); background: var(--white); }
+    .service-card:hover::after { transform: scaleX(1); }
+    .service-icon {
+      width: 52px; height: 52px; border-radius: var(--radius-sm);
+      background: var(--green-pale); display: flex; align-items: center;
+      justify-content: center; margin-bottom: 24px; font-size: 24px;
+    }
+    .service-card h3 {
+      font-size: 20px; font-weight: 700; letter-spacing: -.5px;
+      color: var(--black); margin-bottom: 10px;
+    }
+    .service-card p { font-size: 15px; color: var(--gray-3); line-height: 1.55; }
+    .service-link {
+      display: inline-block; margin-top: 20px; font-size: 14px;
+      font-weight: 600; color: var(--green); text-decoration: none;
+      opacity: 0; transition: opacity .25s;
+    }
+    .service-card:hover .service-link { opacity: 1; }
+
+    /* ── PRICES ── */
+    .prices { background: var(--gray-6); }
+    .prices-inner { max-width: 1200px; margin: 0 auto; }
+    .prices-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .price-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 36px 32px; transition: transform .25s, box-shadow .25s;
+      border: 1.5px solid transparent;
+    }
+    .price-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,.07); border-color: var(--green-pale); }
+    .price-card.featured {
+      background: var(--green); border-color: var(--green);
+    }
+    .price-name { font-size: 18px; font-weight: 700; color: var(--black); margin-bottom: 8px; }
+    .price-card.featured .price-name { color: var(--white); }
+    .price-desc { font-size: 14px; color: var(--gray-3); margin-bottom: 24px; line-height: 1.5; }
+    .price-card.featured .price-desc { color: rgba(255,255,255,.7); }
+    .price-amount { font-size: 36px; font-weight: 700; letter-spacing: -1.5px; color: var(--black); }
+    .price-card.featured .price-amount { color: var(--white); }
+    .price-unit { font-size: 14px; color: var(--gray-4); margin-left: 4px; }
+    .price-card.featured .price-unit { color: rgba(255,255,255,.6); }
+    .price-cta {
+      display: block; text-align: center; margin-top: 28px;
+      background: var(--green-pale); color: var(--green);
+      padding: 14px; border-radius: 980px; font-size: 15px;
+      font-weight: 600; text-decoration: none; border: none; cursor: pointer;
+      font-family: var(--font); transition: background .2s;
+    }
+    .price-card.featured .price-cta { background: rgba(255,255,255,.2); color: var(--white); }
+    .price-cta:hover { background: var(--green); color: var(--white); }
+    .price-card.featured .price-cta:hover { background: rgba(255,255,255,.3); }
+
+    /* ── DOCTORS ── */
+    .doctors { background: var(--black); }
+    .doctors .section-tag { color: #6db58a; }
+    .doctors .section-title { color: var(--white); }
+    .doctors .section-sub { color: var(--gray-4); }
+    .doctors-inner { max-width: 1200px; margin: 0 auto; }
+    .doctors-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .doctor-card {
+      background: var(--gray-1); border-radius: var(--radius);
+      overflow: hidden; transition: transform .25s;
+    }
+    .doctor-card:hover { transform: translateY(-4px); }
+    .doctor-photo {
+      width: 100%; aspect-ratio: 3/4;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; background: var(--gray-2);
+    }
+    .doctor-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+    /* Beautiful colored avatars */
+    .doctor-avatar {
+      width: 100%; aspect-ratio: 3/4;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 52px; font-weight: 800; letter-spacing: -3px;
+      color: rgba(255,255,255,.9);
+    }
+    .da-1 { background: linear-gradient(145deg, #1d4a35, #3a9464); }
+    .da-2 { background: linear-gradient(145deg, #2d3436, #636e72); }
+    .da-3 { background: linear-gradient(145deg, #1e3c72, #2a5298); }
+    .da-4 { background: linear-gradient(145deg, #4a1942, #8e44ad); }
+    .da-5 { background: linear-gradient(145deg, #4a2c1d, #c0392b); }
+    .da-6 { background: linear-gradient(145deg, #1a3a4a, #2980b9); }
+    .da-7 { background: linear-gradient(145deg, #3a4a1d, #7f8c1d); }
+    .doctor-info { padding: 24px; }
+    .doctor-info h3 { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 6px; line-height: 1.3; }
+    .doctor-info p { font-size: 13px; color: var(--gray-4); line-height: 1.4; }
+    .doctor-btn {
+      display: inline-block; margin-top: 14px;
+      font-size: 13px; font-weight: 600; color: #6db58a;
+      text-decoration: none; cursor: pointer;
+      background: none; border: none; padding: 0; font-family: var(--font);
+      transition: color .2s;
+    }
+    .doctor-btn:hover { color: #9ecfb0; }
+
+    /* ── PROMO BANNER ── */
+    .promo { background: var(--green); padding: 80px 48px; }
+    .promo-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 40px; flex-wrap: wrap;
+    }
+    .promo-text h2 {
+      font-size: clamp(28px, 3vw, 44px); font-weight: 700;
+      letter-spacing: -1.5px; color: var(--white); max-width: 22ch; line-height: 1.1;
+    }
+    .promo-text p { font-size: 17px; color: rgba(255,255,255,.7); margin-top: 12px; }
+    .btn-white {
+      background: var(--white); color: var(--green);
+      padding: 17px 32px; border-radius: 980px; font-size: 17px;
+      font-weight: 700; text-decoration: none; white-space: nowrap;
+      transition: transform .15s, box-shadow .2s;
+      box-shadow: 0 4px 20px rgba(0,0,0,.15);
+    }
+    .btn-white:hover { transform: scale(1.03); box-shadow: 0 8px 32px rgba(0,0,0,.2); }
+
+    /* ── REVIEWS ── */
+    .reviews { background: var(--white); }
+    .reviews-inner { max-width: 1200px; margin: 0 auto; }
+    .reviews-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+    .review-card {
+      background: var(--gray-6); border-radius: var(--radius);
+      padding: 36px 32px; transition: transform .25s, box-shadow .25s;
+    }
+    .review-card:hover { transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,.07); background: var(--white); }
+    .review-stars { color: var(--green); font-size: 16px; margin-bottom: 16px; letter-spacing: 2px; }
+    .review-text { font-size: 16px; color: var(--gray-2); line-height: 1.65; }
+    .review-author { margin-top: 24px; display: flex; align-items: center; gap: 12px; }
+    .review-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--green); display: flex; align-items: center;
+      justify-content: center; font-size: 16px; font-weight: 700; color: var(--white);
+      flex-shrink: 0;
+    }
+    .review-name { font-size: 14px; font-weight: 600; color: var(--black); }
+    .review-date { font-size: 12px; color: var(--gray-4); margin-top: 2px; }
+
+    /* ── CONTACTS ── */
+    .contacts { background: var(--gray-6); }
+    .contacts-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start;
+    }
+    .contact-item { margin-bottom: 36px; }
+    .contact-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-4); margin-bottom: 8px; }
+    .contact-value { font-size: 20px; font-weight: 600; color: var(--black); text-decoration: none; display: block; line-height: 1.4; }
+    a.contact-value:hover { color: var(--green); }
+    .contact-value-sm { font-size: 16px; color: var(--gray-2); line-height: 1.7; }
+    .map-card {
+      border-radius: var(--radius); overflow: hidden;
+      background: linear-gradient(145deg, #1d4a35, #2e7d52);
+      padding: 48px; display: flex; flex-direction: column;
+      justify-content: space-between; min-height: 400px;
+    }
+    .map-address { font-size: 24px; font-weight: 700; color: #fff; letter-spacing: -.5px; line-height: 1.3; }
+    .map-hours { margin-top: 20px; }
+    .map-hours p { font-size: 15px; color: rgba(255,255,255,.7); line-height: 1.7; }
+    .map-open-btn {
+      display: inline-block; margin-top: 32px;
+      background: rgba(255,255,255,.15); color: #fff;
+      padding: 14px 24px; border-radius: 980px; font-size: 15px;
+      font-weight: 600; text-decoration: none; backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.2); transition: background .2s;
+    }
+    .map-open-btn:hover { background: rgba(255,255,255,.25); }
+    .socials { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+    .social-btn {
+      background: var(--green-pale); color: var(--green);
+      padding: 10px 20px; border-radius: 980px; font-size: 14px;
+      font-weight: 600; text-decoration: none; transition: background .2s, color .2s;
+    }
+    .social-btn:hover { background: var(--green); color: var(--white); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 999;
+      background: rgba(0,0,0,.5); backdrop-filter: blur(8px);
+      display: none; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white); border-radius: var(--radius);
+      padding: 52px 48px; max-width: 480px; width: 100%;
+      position: relative; animation: modalIn .3s ease;
+    }
+    @keyframes modalIn { from { opacity:0; transform: scale(.95) translateY(20px); } }
+    .modal-close {
+      position: absolute; top: 20px; right: 20px;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--gray-6); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: var(--gray-3); transition: background .2s;
+    }
+    .modal-close:hover { background: var(--gray-5); }
+    .modal h2 { font-size: 28px; font-weight: 700; letter-spacing: -1px; margin-bottom: 8px; }
+    .modal p { font-size: 15px; color: var(--gray-3); margin-bottom: 32px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--gray-2); margin-bottom: 6px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 14px 16px; border-radius: var(--radius-sm);
+      border: 1.5px solid var(--gray-5); font-family: var(--font);
+      font-size: 15px; color: var(--black); background: var(--gray-6);
+      outline: none; transition: border-color .2s;
+      -webkit-appearance: none;
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--green); background: var(--white); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-legal { font-size: 12px; color: var(--gray-4); margin-bottom: 20px; line-height: 1.5; }
+    .form-legal a { color: var(--green); }
+    .form-submit {
+      width: 100%; background: var(--green); color: var(--white);
+      padding: 16px; border-radius: 980px; border: none;
+      font-size: 17px; font-weight: 600; cursor: pointer; font-family: var(--font);
+      transition: background .2s;
+    }
+    .form-submit:hover { background: var(--green-light); }
+
+    /* ── FOOTER ── */
+    footer { background: var(--black); padding: 64px 48px 40px; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+    .footer-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,.08);
+      flex-wrap: wrap; gap: 40px;
+    }
+    .footer-logo { font-size: 22px; font-weight: 700; color: var(--white); letter-spacing: -.5px; }
+    .footer-logo span { color: #6db58a; }
+    .footer-tagline { font-size: 14px; color: var(--gray-4); margin-top: 6px; }
+    .footer-nav { display: flex; gap: 64px; flex-wrap: wrap; }
+    .footer-col h4 { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 16px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col a { font-size: 14px; color: var(--gray-4); text-decoration: none; transition: color .2s; }
+    .footer-col a:hover { color: var(--white); }
+    .footer-bottom {
+      padding-top: 32px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+    }
+    .footer-copy { font-size: 13px; color: var(--gray-3); }
+    .footer-license { font-size: 12px; color: var(--gray-3); max-width: 480px; text-align: right; line-height: 1.5; }
+
+    /* ── NOTICE BAR ── */
+    .notice {
+      background: var(--green); color: rgba(255,255,255,.95);
+      text-align: center; padding: 12px 24px; font-size: 14px; font-weight: 500;
+    }
+    .notice strong { font-weight: 700; }
+
+    /* ── FLOATING CTA (mobile) ── */
+    .float-cta {
+      display: none; position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--green); color: var(--white);
+      padding: 16px 32px; border-radius: 980px; font-size: 16px; font-weight: 700;
+      text-decoration: none; z-index: 98; box-shadow: 0 8px 32px rgba(29,74,53,.4);
+      white-space: nowrap;
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .services-grid { grid-template-columns: repeat(2,1fr); }
+      .doctors-grid { grid-template-columns: repeat(2,1fr); }
+      .about-inner, .contacts-inner { grid-template-columns: 1fr; gap: 48px; }
+      .prices-grid { grid-template-columns: repeat(2,1fr); }
+      .hero-visual { grid-template-columns: 1fr 1fr; height: auto; }
+      .hero-card-main { grid-column: span 2; min-height: 200px; }
+    }
+    @media (max-width: 768px) {
+      nav { padding: 0 24px; }
+      .nav-links { display: none; }
+      .nav-right .nav-cta { display: none; }
+      .burger { display: flex; }
+      section { padding: 80px 24px; }
+      .hero { padding: 100px 24px 60px; }
+      .hero-stats { gap: 32px; }
+      .services-grid { grid-template-columns: 1fr; }
+      .doctors-grid { grid-template-columns: repeat(2,1fr); }
+      .reviews-grid { grid-template-columns: 1fr; }
+      .prices-grid { grid-template-columns: 1fr; }
+      .promo-inner { flex-direction: column; text-align: center; }
+      footer { padding: 48px 24px 32px; }
+      .footer-top { flex-direction: column; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      .footer-license { text-align: center; }
+      .hero-visual { display: none; }
+      .float-cta { display: block; }
+      .hero-stats { margin-top: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Notice Bar -->
+<div class="notice">
+  <strong>⚡ Успейте записаться!</strong> В июне 2026 г. повышение цен на имплантацию и протезирование — запишитесь по прежней стоимости
+</div>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="#" class="nav-logo">For<span>REST</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">О клинике</a></li>
+    <li><a href="#services">Услуги</a></li>
+    <li><a href="#prices">Цены</a></li>
+    <li><a href="#doctors">Врачи</a></li>
+    <li><a href="#reviews">Отзывы</a></li>
+    <li><a href="#contacts">Контакты</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="#" class="nav-cta" onclick="openModal(); return false;">Записаться</a>
+    <button class="burger" id="burger" aria-label="Меню" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#about" onclick="toggleMenu()">О клинике</a>
+  <a href="#services" onclick="toggleMenu()">Услуги</a>
+  <a href="#prices" onclick="toggleMenu()">Цены</a>
+  <a href="#doctors" onclick="toggleMenu()">Врачи</a>
+  <a href="#reviews" onclick="toggleMenu()">Отзывы</a>
+  <a href="#contacts" onclick="toggleMenu()">Контакты</a>
+  <a href="#" class="mobile-cta" onclick="openModal(); toggleMenu(); return false;">Записаться на приём</a>
+</div>
+
+<!-- Floating CTA for mobile -->
+<a href="#" class="float-cta" onclick="openModal(); return false;">Записаться</a>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge">Сыктывкар · с 1996 года</div>
+  <h1>Красивая улыбка<br>это <em>здоровые зубы</em></h1>
+  <p class="hero-sub">Стоматологическая клиника ForREST — комфортное комплексное лечение с заботой о каждом пациенте</p>
+  <div class="hero-actions">
+    <a href="#" class="btn-primary" onclick="openModal(); return false;">Записаться на консультацию</a>
+    <a href="#services" class="btn-secondary">Наши услуги</a>
+  </div>
+
+  <!-- Stats with counter animation -->
+  <div class="hero-stats reveal">
+    <div class="stat">
+      <div class="stat-number"><span class="counter" data-target="25">0</span><span style="color:var(--green)">+</span></div>
+      <div class="stat-label">лет опыта</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number"><span class="counter" data-target="25">0</span><span style="color:var(--green)">K</span></div>
+      <div class="stat-label">довольных пациентов</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number"><span class="counter" data-target="7">0</span></div>
+      <div class="stat-label">специалистов</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number"><span class="counter" data-target="6">0</span></div>
+      <div class="stat-label">направлений лечения</div>
+    </div>
+  </div>
+
+  <!-- Hero visual — clinic photos -->
+  <div class="hero-visual reveal">
+    <div class="hero-card hero-card-photo" style="grid-column: span 2; position:relative; overflow:hidden; border-radius:20px;">
+      <img src="https://drive.google.com/thumbnail?id=1hMfKFrZuLllAKpdT173XPQ456zMA2sHf&sz=w1200"
+           style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;"
+           onerror="this.parentElement.style.background='linear-gradient(135deg,#1d4a35,#2e7d52)'"
+           alt="Клиника ForREST">
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:28px 32px;background:linear-gradient(to top,rgba(0,0,0,.55),transparent);">
+        <div style="font-size:22px;font-weight:700;color:#fff;letter-spacing:-.5px;">Красивая улыбка — это здоровые зубы</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.75);margin-top:4px;">Имплантация · Протезирование · Лечение под микроскопом</div>
+      </div>
+    </div>
+    <div class="hero-card" style="position:relative;overflow:hidden;border-radius:20px;">
+      <img src="https://drive.google.com/thumbnail?id=1w-SFDbHzkqUYRaZsPJyEAmC8_DmdXu5v&sz=w600"
+           style="width:100%;height:100%;object-fit:cover;display:block;"
+           onerror="this.parentElement.style.background='var(--green-pale)'"
+           alt="Клиника ForREST">
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="about-text reveal">
+      <div class="section-tag">О клинике</div>
+      <h2 class="section-title">Более 25 лет возвращаем улыбки</h2>
+      <p style="margin-top:24px;">Стоматология «ФорРест» работает с 1996 года. За это время клиника приняла более 25 000 благодарных пациентов и заслужила их доверие.</p>
+      <p>В нашей клинике работают опытные профессионалы: терапевты, хирурги-имплантологи, ортопеды, гигиенисты-пародонтологи. Все специалисты постоянно повышают квалификацию, участвуя в семинарах и мастер-классах.</p>
+      <p>Качественные услуги, комфортный сервис — мы окружаем пациентов заботой на протяжении всего курса лечения.</p>
+      <a href="#" class="btn-primary" style="display:inline-block;margin-top:32px;" onclick="openModal(); return false;">Записаться на приём</a>
+    </div>
+    <div class="about-visual reveal" style="padding:0;background:none;box-shadow:none;min-height:0;">
+      <div style="border-radius:20px;overflow:hidden;aspect-ratio:4/3;box-shadow:0 24px 60px rgba(0,0,0,.12);">
+        <img src="https://drive.google.com/thumbnail?id=1OviROnyDelkOJV6ckIZQ5gZSyOwEZEkI&sz=w900"
+             style="width:100%;height:100%;object-fit:cover;display:block;"
+             onerror="this.style.display='none';this.parentElement.style.background='linear-gradient(135deg,#1d4a35,#3a9464)'"
+             alt="Оборудование клиники">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section class="services" id="services">
+  <div class="services-inner">
+    <div class="section-header reveal">
+      <div class="section-tag">Услуги</div>
+      <h2 class="section-title">Полный спектр стоматологической помощи</h2>
+      <p class="section-sub">Современные технологии и опытные специалисты для вашего здоровья и красоты</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <div class="service-icon">🦷</div>
+        <h3>Имплантация</h3>
+        <p>Восстановление зубов на надёжных имплантатах ведущих мировых производителей с гарантией результата.</p>
+        <a href="#" class="service-link" onclick="openModal(); return false;">Записаться →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">✨</div>
+        <h3>Тотальное протезирование «Всё на 4»</h3>
+        <p>Современная методика All-on-4 — полное восстановление зубного ряда всего на четырёх имплантатах.</p>
+        <a href="#" class="service-link" onclick="openModal(); return false;">Записаться →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">💎</div>
+        <h3>Протезирование</h3>
+        <p>Коронки, мосты и виниры из высококачественных материалов для идеальной эстетики и функциональности.</p>
+        <a href="#" class="service-link" onclick="openModal(); return false;">Записаться →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🔬</div>
+        <h3>Лечение под микроскопом</h3>
+        <p>Точность в каждой детали — стоматологический микроскоп позволяет выявить и устранить проблемы на ранней стадии.</p>
+        <a href="#" class="service-link" onclick="openModal(); return false;">Записаться →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🫧</div>
+        <h3>Профессиональная гигиена</h3>
+        <p>Удаление зубного камня, полировка и фторирование — фундамент здоровья зубов и свежести дыхания.</p>
+        <a href="#" class="service-link" onclick="openModal(); return false;">Записаться →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">🦺</div>
+        <h3>Съёмное протезирование</h3>
+        <p>Современные съёмные конструкции из лёгких гибких материалов — комфортно и эстетично.</p>
+        <a href="#" class="service-link" onclick="openModal(); return false;">Записаться →</a>
+      </div>
+      <div class="service-card reveal">
+        <div class="service-icon">⭐</div>
+        <h3>Отбеливание зубов</h3>
+        <p>Профессиональное отбеливание с долгосрочным эффектом — до 8 тонов светлее за одно посещение.</p>
+        <a href="#" class="service-link" onclick="openModal(); return false;">Записаться →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Prices -->
+<section class="prices" id="prices">
+  <div class="prices-inner">
+    <div class="section-header reveal">
+      <div class="section-tag">Цены</div>
+      <h2 class="section-title">Прозрачное ценообразование</h2>
+      <p class="section-sub">Точную стоимость сообщим после консультации — цена зависит от клинической ситуации</p>
+    </div>
+    <div class="prices-grid">
+      <div class="price-card reveal">
+        <div class="price-name">Консультация</div>
+        <div class="price-desc">Осмотр, снимок, составление плана лечения</div>
+        <div>
+          <span class="price-amount">Бесплатно</span>
+        </div>
+        <button class="price-cta" onclick="openModal()">Записаться</button>
+      </div>
+      <div class="price-card featured reveal">
+        <div class="price-name">Имплантация</div>
+        <div class="price-desc">Под ключ — имплантат, абатмент, коронка</div>
+        <div>
+          <span class="price-amount">от 45 000</span>
+          <span class="price-unit">₽</span>
+        </div>
+        <button class="price-cta" onclick="openModal()">Записаться</button>
+      </div>
+      <div class="price-card reveal">
+        <div class="price-name">Протезирование</div>
+        <div class="price-desc">Коронки, мосты, виниры из современных материалов</div>
+        <div>
+          <span class="price-amount">от 12 000</span>
+          <span class="price-unit">₽</span>
+        </div>
+        <button class="price-cta" onclick="openModal()">Записаться</button>
+      </div>
+      <div class="price-card reveal">
+        <div class="price-name">Гигиена полости рта</div>
+        <div class="price-desc">Профессиональная чистка, полировка, фторирование</div>
+        <div>
+          <span class="price-amount">от 4 000</span>
+          <span class="price-unit">₽</span>
+        </div>
+        <button class="price-cta" onclick="openModal()">Записаться</button>
+      </div>
+      <div class="price-card reveal">
+        <div class="price-name">Лечение под микроскопом</div>
+        <div class="price-desc">Эндодонтическое лечение каналов зуба</div>
+        <div>
+          <span class="price-amount">от 8 000</span>
+          <span class="price-unit">₽</span>
+        </div>
+        <button class="price-cta" onclick="openModal()">Записаться</button>
+      </div>
+      <div class="price-card reveal">
+        <div class="price-name">Все на 4</div>
+        <div class="price-desc">Тотальное протезирование на 4 имплантатах</div>
+        <div>
+          <span class="price-amount">от 180 000</span>
+          <span class="price-unit">₽</span>
+        </div>
+        <button class="price-cta" onclick="openModal()">Записаться</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Promo -->
+<div class="promo">
+  <div class="promo-inner">
+    <div class="promo-text">
+      <h2>Бесплатная консультация любого специалиста</h2>
+      <p>При условии выполнения профессиональной гигиены полости рта в клинике ForREST</p>
+    </div>
+    <a href="#" class="btn-white" onclick="openModal(); return false;">Записаться бесплатно</a>
+  </div>
+</div>
+
+<!-- Doctors -->
+<section class="doctors" id="doctors">
+  <div class="doctors-inner">
+    <div class="section-header reveal">
+      <div class="section-tag">Наша команда</div>
+      <h2 class="section-title">Врачи, которым доверяют</h2>
+      <p class="section-sub">Мы собрали лучших специалистов и рады работать вместе</p>
+    </div>
+    <div class="doctors-grid">
+      <div class="doctor-card reveal">
+        <div class="doctor-photo">
+          <img src="https://drive.google.com/thumbnail?id=1HDRNiRYbbE7jddjrcPK0hlsI1yKehriG&sz=w600"
+               onerror="this.style.display='none';this.parentElement.classList.add('da-1')"
+               alt="Пенгрин Оксана Петровна">
+        </div>
+        <div class="doctor-info">
+          <h3>Пенгрин Оксана Петровна</h3>
+          <p>Главный врач, стоматолог</p>
+          <button class="doctor-btn" onclick="openModal()">Записаться →</button>
+        </div>
+      </div>
+      <div class="doctor-card reveal">
+        <div class="doctor-photo">
+          <img src="https://drive.google.com/thumbnail?id=1jN7PgroQcDR1LVqNTrocMIAeloNFQWAi&sz=w600"
+               onerror="this.style.display='none';this.parentElement.classList.add('da-2')"
+               alt="Пенгрин Александра Олеговна">
+        </div>
+        <div class="doctor-info">
+          <h3>Пенгрин Александра Олеговна</h3>
+          <p>Стоматолог-ортопед, ортодонт</p>
+          <button class="doctor-btn" onclick="openModal()">Записаться →</button>
+        </div>
+      </div>
+      <div class="doctor-card reveal">
+        <div class="doctor-photo">
+          <img src="https://drive.google.com/thumbnail?id=1aJ3IHP42jdI03L6u6S5Ah5Tm9sIW7_Ne&sz=w600"
+               onerror="this.style.display='none';this.parentElement.classList.add('da-3')"
+               alt="Загреба Николай Витальевич">
+        </div>
+        <div class="doctor-info">
+          <h3>Загреба Николай Витальевич</h3>
+          <p>Хирург-имплантолог</p>
+          <button class="doctor-btn" onclick="openModal()">Записаться →</button>
+        </div>
+      </div>
+      <div class="doctor-card reveal">
+        <div class="doctor-photo">
+          <img src="https://drive.google.com/thumbnail?id=1h8kTta6OEPzWoftmiDNX5riwS5BJVBY7&sz=w600"
+               onerror="this.style.display='none';this.parentElement.classList.add('da-4')"
+               alt="Паршин Геннадий Юрьевич">
+        </div>
+        <div class="doctor-info">
+          <h3>Паршин Геннадий Юрьевич</h3>
+          <p>Стоматолог-ортопед, хирург, терапевт</p>
+          <button class="doctor-btn" onclick="openModal()">Записаться →</button>
+        </div>
+      </div>
+      <div class="doctor-card reveal">
+        <div class="doctor-photo">
+          <img src="https://drive.google.com/thumbnail?id=1B_b-gBIDU5E81lL_YFsjQ7ru0l2zmy-7&sz=w600"
+               onerror="this.style.display='none';this.parentElement.classList.add('da-5')"
+               alt="Пенгрина Светлана Васильевна">
+        </div>
+        <div class="doctor-info">
+          <h3>Пенгрина Светлана Васильевна</h3>
+          <p>Стоматолог-терапевт, детский стоматолог</p>
+          <button class="doctor-btn" onclick="openModal()">Записаться →</button>
+        </div>
+      </div>
+      <div class="doctor-card reveal">
+        <div class="doctor-photo">
+          <img src="https://drive.google.com/thumbnail?id=114N-WebLRNxNPC17xiV3r3-axZv9lqB1&sz=w600"
+               onerror="this.style.display='none';this.parentElement.classList.add('da-6')"
+               alt="Казакова Мария Александровна">
+        </div>
+        <div class="doctor-info">
+          <h3>Казакова Мария Александровна</h3>
+          <p>Гигиенист</p>
+          <button class="doctor-btn" onclick="openModal()">Записаться →</button>
+        </div>
+      </div>
+      <div class="doctor-card reveal">
+        <div class="doctor-photo">
+          <img src="https://drive.google.com/thumbnail?id=1F8-VjtICtimooROfzzUlWbInWkyqWmaz&sz=w600"
+               onerror="this.style.display='none';this.parentElement.classList.add('da-7')"
+               alt="Мингалева Мария Николаевна">
+        </div>
+        <div class="doctor-info">
+          <h3>Мингалева Мария Николаевна</h3>
+          <p>Гигиенист</p>
+          <button class="doctor-btn" onclick="openModal()">Записаться →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Reviews -->
+<section class="reviews" id="reviews">
+  <div class="reviews-inner">
+    <div class="section-header reveal">
+      <div class="section-tag">Отзывы</div>
+      <h2 class="section-title">Что говорят наши пациенты</h2>
+      <p class="section-sub">Самое ценное — честные отзывы довольных пациентов о нашей работе</p>
+    </div>
+    <div class="reviews-grid">
+      <div class="review-card reveal">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">«Долго боялась стоматологов, но здесь всё по-другому. Врачи внимательные, всё объяснили подробно, лечение прошло безболезненно. Огромное спасибо!»</p>
+        <div class="review-author">
+          <div class="review-avatar">А</div>
+          <div>
+            <div class="review-name">Анна К.</div>
+            <div class="review-date">Яндекс Карты · 5.0</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">«Сделали имплантацию — всё прошло идеально. Профессионализм врачей на высоте, клиника чистая и современная. Буду ходить только сюда.»</p>
+        <div class="review-author">
+          <div class="review-avatar">С</div>
+          <div>
+            <div class="review-name">Сергей М.</div>
+            <div class="review-date">2ГИС · 5.0</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">«Хожу в ForREST уже несколько лет. Главный врач — настоящий профессионал, всегда находит подход к пациенту. Спасибо всему коллективу за заботу!»</p>
+        <div class="review-author">
+          <div class="review-avatar">Е</div>
+          <div>
+            <div class="review-name">Елена В.</div>
+            <div class="review-date">Google · 5.0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Contacts -->
+<section class="contacts" id="contacts">
+  <div class="contacts-inner">
+    <div class="reveal">
+      <div class="section-tag">Контакты</div>
+      <h2 class="section-title">Мы здесь для вас</h2>
+      <div style="margin-top:48px;">
+        <div class="contact-item">
+          <div class="contact-label">Телефон</div>
+          <a href="tel:+79091265559" class="contact-value">+7 (909) 126-55-59</a>
+          <a href="tel:+79310094373" class="contact-value">+7 (931) 009-43-73</a>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">Email</div>
+          <a href="mailto:forrest.clinic@yandex.ru" class="contact-value">forrest.clinic@yandex.ru</a>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">Адрес</div>
+          <div class="contact-value-sm">г. Сыктывкар,<br>ул. Интернациональная, 157/157А</div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-label">Мессенджеры</div>
+          <div class="socials">
+            <a href="https://t.me/forrest_newjivobot" target="_blank" class="social-btn">Telegram</a>
+            <a href="https://vk.com/forrest_komi" target="_blank" class="social-btn">ВКонтакте</a>
+          </div>
+        </div>
+        <a href="#" class="btn-primary" style="margin-top:8px;display:inline-block;" onclick="openModal(); return false;">Записаться онлайн</a>
+      </div>
+    </div>
+    <div class="map-card reveal">
+      <div>
+        <div style="font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:12px;">Адрес клиники</div>
+        <div class="map-address">г. Сыктывкар,<br>ул. Интернациональная, 157/157А</div>
+      </div>
+      <div class="map-hours">
+        <div style="font-size:13px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:12px;">Режим работы</div>
+        <p>Понедельник – пятница: 08:30 – 20:30</p>
+        <p>Суббота – воскресенье: 10:00 – 18:00</p>
+        <a href="https://yandex.ru/maps/?text=%D0%A1%D1%8B%D0%BA%D1%82%D1%8B%D0%B2%D0%BA%D0%B0%D1%80+%D0%98%D0%BD%D1%82%D0%B5%D1%80%D0%BD%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D0%B0%D1%8F+157"
+           target="_blank" class="map-open-btn">
+          Открыть в Яндекс.Картах →
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">For<span>REST</span></div>
+        <div class="footer-tagline">Стоматология · Сыктывкар · с 1996 года</div>
+      </div>
+      <div class="footer-nav">
+        <div class="footer-col">
+          <h4>Клиника</h4>
+          <ul>
+            <li><a href="#about">О нас</a></li>
+            <li><a href="#doctors">Врачи</a></li>
+            <li><a href="#reviews">Отзывы</a></li>
+            <li><a href="#contacts">Контакты</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Услуги</h4>
+          <ul>
+            <li><a href="#services">Имплантация</a></li>
+            <li><a href="#services">Протезирование</a></li>
+            <li><a href="#services">Лечение под микроскопом</a></li>
+            <li><a href="#services">Гигиена полости рта</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Связь</h4>
+          <ul>
+            <li><a href="tel:+79091265559">+7 (909) 126-55-59</a></li>
+            <li><a href="tel:+79310094373">+7 (931) 009-43-73</a></li>
+            <li><a href="mailto:forrest.clinic@yandex.ru">forrest.clinic@yandex.ru</a></li>
+            <li><a href="https://t.me/forrest_newjivobot">Telegram</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 ForREST. Все права защищены.</div>
+      <div class="footer-license">Лицензия № ЛО-11-01-002274 от 31 октября 2019 г. Сайт носит информационный характер и не является публичной офертой.</div>
+    </div>
+  </div>
+</footer>
+
+<!-- Promo Popup -->
+<div class="modal-overlay" id="promoPopup" onclick="if(event.target===this)closePromo()">
+  <div class="modal" style="text-align:center;max-width:440px;">
+    <button class="modal-close" onclick="closePromo()">✕</button>
+    <div style="width:56px;height:56px;background:var(--green-pale);border-radius:50%;
+         display:flex;align-items:center;justify-content:center;
+         font-size:28px;margin:0 auto 20px;">🎁</div>
+    <h2 style="font-size:26px;line-height:1.2;">Бесплатная консультация любого специалиста</h2>
+    <p style="margin-top:12px;margin-bottom:0;font-size:15px;color:var(--gray-3);line-height:1.6;">
+      При условии выполнения профессиональной гигиены полости рта в клинике ForREST.<br>
+      <strong style="color:var(--black);">Начните путь к здоровой улыбке прямо сейчас!</strong>
+    </p>
+    <button class="form-submit" style="margin-top:28px;" onclick="closePromo();openModal();">
+      Запись на консультацию
+    </button>
+    <button onclick="closePromo()" style="display:block;width:100%;margin-top:12px;
+      background:none;border:none;font-size:14px;color:var(--gray-4);
+      cursor:pointer;font-family:var(--font);padding:4px;">
+      Нет, спасибо
+    </button>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h2>Записаться на приём</h2>
+    <p>Оставьте заявку — мы свяжемся с вами в течение 30 минут</p>
+    <form onsubmit="submitForm(event)">
+      <div class="form-group">
+        <label>Ваше имя</label>
+        <input type="text" placeholder="Иван Иванов" required>
+      </div>
+      <div class="form-group">
+        <label>Телефон</label>
+        <input type="tel" placeholder="+7 (___) ___-__-__" required>
+      </div>
+      <div class="form-group">
+        <label>Услуга</label>
+        <select>
+          <option value="">Выберите услугу</option>
+          <option>Имплантация</option>
+          <option>Тотальное протезирование «Всё на 4»</option>
+          <option>Протезирование</option>
+          <option>Лечение под микроскопом</option>
+          <option>Профессиональная гигиена</option>
+          <option>Съёмное протезирование</option>
+          <option>Консультация (бесплатно)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Комментарий (необязательно)</label>
+        <textarea placeholder="Опишите вашу ситуацию…"></textarea>
+      </div>
+      <div class="form-legal">
+        Отправляя форму, вы соглашаетесь с <a href="#">политикой обработки персональных данных</a>
+      </div>
+      <button type="submit" class="form-submit">Записаться</button>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" style="
+  position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--green);color:#fff;padding:16px 28px;border-radius:980px;
+  font-size:15px;font-weight:600;z-index:9999;opacity:0;
+  transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;
+  box-shadow:0 8px 32px rgba(29,74,53,.4);
+">✓ Заявка принята! Мы свяжемся с вами скоро</div>
+
+<script>
+  // Promo popup — показывается через 2 сек, один раз за сессию
+  function closePromo() {
+    document.getElementById('promoPopup').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('promoPopup').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }, 2000);
+  });
+
+  // Modal
+  function openModal() {
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // Mobile menu
+  function toggleMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const burger = document.getElementById('burger');
+    menu.classList.toggle('open');
+    burger.classList.toggle('open');
+  }
+
+  // Form
+  function submitForm(e) {
+    e.preventDefault();
+    closeModal();
+    const toast = document.getElementById('toast');
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(80px)';
+    }, 3500);
+  }
+
+  // Scroll reveal
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // Stagger grid items
+  document.querySelectorAll('.services-grid .reveal, .doctors-grid .reveal, .reviews-grid .reveal, .prices-grid .reveal').forEach((el, i) => {
+    el.style.transitionDelay = (i % 4) * 90 + 'ms';
+  });
+
+  // Counter animation
+  const counters = document.querySelectorAll('.counter');
+  const counterObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const target = +el.dataset.target;
+      const duration = 1200;
+      const step = target / (duration / 16);
+      let current = 0;
+      const timer = setInterval(() => {
+        current = Math.min(current + step, target);
+        el.textContent = Math.floor(current);
+        if (current >= target) clearInterval(timer);
+      }, 16);
+      counterObserver.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => counterObserver.observe(c));
+
+  // Nav bg on scroll
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('nav');
+    nav.style.background = window.scrollY > 40
+      ? 'rgba(255,255,255,0.96)'
+      : 'rgba(255,255,255,0.82)';
+  });
+</script>
+</body>
+</html>
