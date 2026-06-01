@@ -342,6 +342,23 @@
     .price-cta:hover { background: var(--green); color: var(--white); }
     .price-card.featured .price-cta:hover { background: rgba(255,255,255,.3); }
 
+    /* ── PRICE TABS ── */
+    .ptab {
+      background: none; border: none; padding: 10px 20px; border-radius: 50px;
+      font-size: 14px; font-weight: 600; color: var(--gray-3); cursor: pointer;
+      transition: all .2s; white-space: nowrap; font-family: var(--font);
+    }
+    .ptab.active { background: var(--white); color: var(--green); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+    .ptab:hover:not(.active) { color: var(--green); }
+    .prow {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 0; border-bottom: 1px solid var(--gray-5); gap: 16px;
+    }
+    .prow:last-child { border-bottom: none; }
+    .prow span:first-child { font-size: 15px; color: var(--gray-1); line-height: 1.4; }
+    .pprice { font-weight: 700; color: var(--green); white-space: nowrap; font-size: 16px; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
     /* ── DOCTORS ── */
     .doctors { background: var(--black); }
     .doctors .section-tag { color: #6db58a; }
@@ -764,59 +781,240 @@
       <h2 class="section-title">Прозрачное ценообразование</h2>
       <p class="section-sub">Точную стоимость сообщим после консультации — цена зависит от клинической ситуации</p>
     </div>
+
+    <!-- Карточки -->
     <div class="prices-grid">
       <div class="price-card reveal">
         <div class="price-name">Консультация</div>
-        <div class="price-desc">Осмотр, снимок, составление плана лечения</div>
-        <div>
-          <span class="price-amount">Бесплатно</span>
-        </div>
+        <div class="price-desc">Терапевт, хирург или ортопед — осмотр и план лечения</div>
+        <div><span class="price-amount">800</span><span class="price-unit">₽</span></div>
         <button class="price-cta" onclick="openModal()">Записаться</button>
       </div>
       <div class="price-card featured reveal">
         <div class="price-name">Имплантация</div>
-        <div class="price-desc">Под ключ — имплантат, абатмент, коронка</div>
-        <div>
-          <span class="price-amount">от 45 000</span>
-          <span class="price-unit">₽</span>
-        </div>
+        <div class="price-desc">Имплантат Medentika с установкой</div>
+        <div><span class="price-amount">от 20 000</span><span class="price-unit">₽</span></div>
         <button class="price-cta" onclick="openModal()">Записаться</button>
       </div>
       <div class="price-card reveal">
         <div class="price-name">Протезирование</div>
-        <div class="price-desc">Коронки, мосты, виниры из современных материалов</div>
-        <div>
-          <span class="price-amount">от 12 000</span>
-          <span class="price-unit">₽</span>
-        </div>
+        <div class="price-desc">Металлокерамика, диоксид циркония, вкладки</div>
+        <div><span class="price-amount">от 12 100</span><span class="price-unit">₽</span></div>
         <button class="price-cta" onclick="openModal()">Записаться</button>
       </div>
       <div class="price-card reveal">
-        <div class="price-name">Гигиена полости рта</div>
-        <div class="price-desc">Профессиональная чистка, полировка, фторирование</div>
-        <div>
-          <span class="price-amount">от 4 000</span>
-          <span class="price-unit">₽</span>
-        </div>
+        <div class="price-name">Гигиена</div>
+        <div class="price-desc">Профессиональная 4-этапная чистка с гарантией</div>
+        <div><span class="price-amount">от 2 500</span><span class="price-unit">₽</span></div>
         <button class="price-cta" onclick="openModal()">Записаться</button>
       </div>
       <div class="price-card reveal">
-        <div class="price-name">Лечение под микроскопом</div>
-        <div class="price-desc">Эндодонтическое лечение каналов зуба</div>
-        <div>
-          <span class="price-amount">от 8 000</span>
-          <span class="price-unit">₽</span>
-        </div>
+        <div class="price-name">Лечение кариеса</div>
+        <div class="price-desc">Световая пломба с гарантией 1 год, включает анестезию</div>
+        <div><span class="price-amount">от 5 000</span><span class="price-unit">₽</span></div>
         <button class="price-cta" onclick="openModal()">Записаться</button>
       </div>
       <div class="price-card reveal">
-        <div class="price-name">Все на 4</div>
-        <div class="price-desc">Тотальное протезирование на 4 имплантатах</div>
-        <div>
-          <span class="price-amount">от 180 000</span>
-          <span class="price-unit">₽</span>
-        </div>
+        <div class="price-name">Работа с микроскопом</div>
+        <div class="price-desc">Точное лечение с увеличением</div>
+        <div><span class="price-amount">от 4 500</span><span class="price-unit">₽</span></div>
         <button class="price-cta" onclick="openModal()">Записаться</button>
+      </div>
+    </div>
+
+    <!-- Кнопка раскрытия -->
+    <div style="text-align:center;margin-top:40px;">
+      <button id="priceToggleBtn" onclick="toggleFullPrice()" style="background:none;border:2px solid var(--green);color:var(--green);font-size:15px;font-weight:600;padding:14px 36px;border-radius:50px;cursor:pointer;transition:all .2s;font-family:var(--font);">
+        Смотреть полный прайс ↓
+      </button>
+    </div>
+
+    <!-- Полный прайс (скрыт) — Apple tab style -->
+    <div id="fullPriceList" style="display:none;margin-top:48px;">
+      <!-- Таб-навигация -->
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;">
+        <div id="priceTabs" style="display:flex;gap:8px;width:max-content;margin:0 auto;background:var(--gray-6);border-radius:50px;padding:6px;">
+          <button class="ptab active" onclick="showPriceTab('diag',this)">Диагностика</button>
+          <button class="ptab" onclick="showPriceTab('hygiene',this)">Гигиена</button>
+          <button class="ptab" onclick="showPriceTab('caries',this)">Лечение</button>
+          <button class="ptab" onclick="showPriceTab('micro',this)">Микроскоп</button>
+          <button class="ptab" onclick="showPriceTab('remove',this)">Удаление</button>
+          <button class="ptab" onclick="showPriceTab('implant',this)">Имплантация</button>
+          <button class="ptab" onclick="showPriceTab('prosth',this)">Протезирование</button>
+          <button class="ptab" onclick="showPriceTab('perio',this)">Пародонтология</button>
+        </div>
+      </div>
+
+      <!-- Контент табов -->
+      <div style="margin-top:28px;max-width:700px;margin-left:auto;margin-right:auto;">
+
+        <div id="tab-diag" class="ptab-content" style="animation:fadeIn .3s ease;">
+          <div class="prow"><span>Первичная консультация (терапевт, хирург, ортопед)</span><span class="pprice">800 ₽</span></div>
+          <div class="prow"><span>Компьютерная томография (3D снимок)</span><span class="pprice">3 600 ₽</span></div>
+          <div class="prow"><span>Прицельный снимок</span><span class="pprice">350 ₽</span></div>
+          <div class="prow" style="border:none;"><span>Ортопантомограмма</span><span class="pprice">850 ₽</span></div>
+        </div>
+
+        <div id="tab-hygiene" class="ptab-content" style="display:none;animation:fadeIn .3s ease;">
+          <div class="prow" style="border:none;"><span>Профессиональная 4-этапная чистка с гарантией качества</span><span class="pprice">2 500–5 000 ₽</span></div>
+        </div>
+
+        <div id="tab-caries" class="ptab-content" style="display:none;animation:fadeIn .3s ease;">
+          <div style="font-size:13px;color:var(--gray-3);margin-bottom:16px;">Включает анестезию</div>
+          <div class="prow"><span>Первичная консультация стоматолога-терапевта</span><span class="pprice">800 ₽</span></div>
+          <div class="prow"><span>Лечение кариеса с гарантией 1 год (пломба световая)</span><span class="pprice">5 000–7 000 ₽</span></div>
+          <div class="prow"><span>Лечение пульпита и его форм</span><span class="pprice">11 000–23 000 ₽</span></div>
+          <div class="prow" style="border:none;"><span>Лечение периодонтита и его форм</span><span class="pprice">16 000–28 000 ₽</span></div>
+        </div>
+
+        <div id="tab-micro" class="ptab-content" style="display:none;animation:fadeIn .3s ease;">
+          <div class="prow"><span>Работа с микроскопом</span><span class="pprice">от 4 500 ₽</span></div>
+          <div class="prow" style="border:none;"><span>Кабинетное отбеливание зубов</span><span class="pprice">от 2 500 ₽</span></div>
+        </div>
+
+        <div id="tab-remove" class="ptab-content" style="display:none;animation:fadeIn .3s ease;">
+          <div class="prow"><span>Первичная консультация стоматолога-хирурга</span><span class="pprice">800 ₽</span></div>
+          <div class="prow"><span>Удаление молочного зуба</span><span class="pprice">от 1 000 ₽</span></div>
+          <div class="prow"><span>Удаление зуба</span><span class="pprice">от 2 000 ₽</span></div>
+          <div class="prow"><span>Удаление ретинированного зуба</span><span class="pprice">от 4 000 ₽</span></div>
+          <div class="prow"><span>Удаление зуба мудрости</span><span class="pprice">от 4 000 ₽</span></div>
+          <div class="prow" style="border:none;"><span>Удаление подвижного зуба</span><span class="pprice">от 1 000 ₽</span></div>
+        </div>
+
+        <div id="tab-implant" class="ptab-content" style="display:none;animation:fadeIn .3s ease;">
+          <div class="prow"><span>Первичная консультация хирурга-имплантолога</span><span class="pprice">800 ₽</span></div>
+          <div class="prow" style="border:none;"><span>Имплантат Medentika с установкой</span><span class="pprice">от 20 000 ₽</span></div>
+        </div>
+
+        <div id="tab-prosth" class="ptab-content" style="display:none;animation:fadeIn .3s ease;">
+          <div class="prow"><span>Первичная консультация стоматолога-ортопеда</span><span class="pprice">800 ₽</span></div>
+          <div class="prow"><span>Металлокерамическая коронка</span><span class="pprice">12 100 ₽</span></div>
+          <div class="prow"><span>Коронка из диоксида циркония</span><span class="pprice">23 800 ₽</span></div>
+          <div class="prow"><span>Вкладка под ключ</span><span class="pprice">6 850 ₽</span></div>
+          <div class="prow"><span>Частичный съёмный (от 4 до 11 зубов)</span><span class="pprice">от 10 000 ₽</span></div>
+          <div class="prow" style="border:none;"><span>Полный съёмный протез</span><span class="pprice">от 15 000 ₽</span></div>
+        </div>
+
+        <div id="tab-perio" class="ptab-content" style="display:none;animation:fadeIn .3s ease;">
+          <div class="prow"><span>Первичная консультация стоматолога</span><span class="pprice">800 ₽</span></div>
+          <div class="prow"><span>Открытый кюретаж в области одного зуба</span><span class="pprice">от 1 000 ₽</span></div>
+          <div class="prow"><span>Закрытый кюретаж в области одного зуба</span><span class="pprice">от 1 000 ₽</span></div>
+          <div class="prow"><span>Лоскутная операция в области одного зуба</span><span class="pprice">от 2 000 ₽</span></div>
+          <div class="prow" style="border:none;"><span>Шинирование зубов, за каждый зуб</span><span class="pprice">от 1 200 ₽</span></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:40px;">
+        <button class="btn-primary" onclick="openModal()">Записаться на консультацию</button>
+      </div>
+    </div>
+
+    <div style="display:none;">
+      <!-- Диагностика -->
+      <div class="reveal" style="background:var(--gray-6);border-radius:var(--radius);overflow:hidden;">
+        <div style="padding:20px 28px;background:var(--green);color:#fff;">
+          <div style="font-size:18px;font-weight:700;">Диагностика</div>
+        </div>
+        <div style="padding:8px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Первичная консультация (терапевт, хирург, ортопед)</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">800 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Компьютерная томография (3D снимок)</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">3 600 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Прицельный снимок</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">350 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;"><span style="font-size:15px;color:var(--gray-2);">Ортопантомограмма</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">850 ₽</span></div>
+        </div>
+      </div>
+
+      <!-- Гигиена -->
+      <div class="reveal" style="background:var(--gray-6);border-radius:var(--radius);overflow:hidden;">
+        <div style="padding:20px 28px;background:var(--green);color:#fff;">
+          <div style="font-size:18px;font-weight:700;">Гигиена и профилактика</div>
+        </div>
+        <div style="padding:8px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;"><span style="font-size:15px;color:var(--gray-2);">Профессиональная 4-этапная чистка зубов с гарантией качества</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">2 500–5 000 ₽</span></div>
+        </div>
+      </div>
+
+      <!-- Лечение кариеса -->
+      <div class="reveal" style="background:var(--gray-6);border-radius:var(--radius);overflow:hidden;">
+        <div style="padding:20px 28px;background:var(--green);color:#fff;">
+          <div style="font-size:18px;font-weight:700;">Лечение кариеса <span style="font-size:13px;font-weight:400;opacity:.8;">(включает анестезию)</span></div>
+        </div>
+        <div style="padding:8px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Первичная консультация стоматолога-терапевта</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">800 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Лечение кариеса с гарантией 1 год (пломба световая)</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">5 000–7 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Лечение пульпита и его форм</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">11 000–23 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;"><span style="font-size:15px;color:var(--gray-2);">Лечение периодонтита и его форм</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">16 000–28 000 ₽</span></div>
+        </div>
+      </div>
+
+      <!-- Микроскоп и отбеливание -->
+      <div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:var(--gray-6);border-radius:var(--radius);overflow:hidden;">
+          <div style="padding:20px 24px;background:var(--green);color:#fff;font-size:16px;font-weight:700;">Работа с увеличением</div>
+          <div style="padding:14px 24px;"><div style="font-size:15px;color:var(--gray-2);margin-bottom:8px;">Работа с микроскопом</div><div style="font-weight:700;color:var(--green);font-size:18px;">от 4 500 ₽</div></div>
+        </div>
+        <div style="background:var(--gray-6);border-radius:var(--radius);overflow:hidden;">
+          <div style="padding:20px 24px;background:var(--green);color:#fff;font-size:16px;font-weight:700;">Отбеливание зубов</div>
+          <div style="padding:14px 24px;"><div style="font-size:15px;color:var(--gray-2);margin-bottom:8px;">Кабинетное отбеливание</div><div style="font-weight:700;color:var(--green);font-size:18px;">от 2 500 ₽</div></div>
+        </div>
+      </div>
+
+      <!-- Удаление -->
+      <div class="reveal" style="background:var(--gray-6);border-radius:var(--radius);overflow:hidden;">
+        <div style="padding:20px 28px;background:var(--green);color:#fff;">
+          <div style="font-size:18px;font-weight:700;">Удаление зубов</div>
+        </div>
+        <div style="padding:8px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Первичная консультация стоматолога-хирурга</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">800 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Удаление молочного зуба</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 1 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Удаление зуба</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 2 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Удаление ретинированного зуба</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 4 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Удаление зуба мудрости</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 4 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;"><span style="font-size:15px;color:var(--gray-2);">Удаление подвижного зуба</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 1 000 ₽</span></div>
+        </div>
+      </div>
+
+      <!-- Имплантация -->
+      <div class="reveal" style="background:var(--gray-6);border-radius:var(--radius);overflow:hidden;">
+        <div style="padding:20px 28px;background:var(--green);color:#fff;">
+          <div style="font-size:18px;font-weight:700;">Имплантация зубов</div>
+        </div>
+        <div style="padding:8px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Имплантат Medentika с установкой</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 20 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;"><span style="font-size:15px;color:var(--gray-2);">Первичная консультация хирурга-имплантолога</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">800 ₽</span></div>
+        </div>
+      </div>
+
+      <!-- Протезирование -->
+      <div class="reveal" style="background:var(--gray-6);border-radius:var(--radius);overflow:hidden;">
+        <div style="padding:20px 28px;background:var(--green);color:#fff;">
+          <div style="font-size:18px;font-weight:700;">Протезирование</div>
+        </div>
+        <div style="padding:8px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Первичная консультация стоматолога-ортопеда</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">800 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Металлокерамическая коронка</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">12 100 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Коронка из диоксида циркония</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">23 800 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Вкладка под ключ</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">6 850 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Частичный съёмный (от 4 до 11 зубов)</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 10 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;"><span style="font-size:15px;color:var(--gray-2);">Полный съёмный протез</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 15 000 ₽</span></div>
+        </div>
+      </div>
+
+      <!-- Пародонтология -->
+      <div class="reveal" style="background:var(--gray-6);border-radius:var(--radius);overflow:hidden;">
+        <div style="padding:20px 28px;background:var(--green);color:#fff;">
+          <div style="font-size:18px;font-weight:700;">Пародонтология</div>
+        </div>
+        <div style="padding:8px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Первичная консультация стоматолога</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">800 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Открытый кюретаж в области одного зуба</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 1 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Закрытый кюретаж в области одного зуба</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 1 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;border-bottom:1px solid var(--gray-5);"><span style="font-size:15px;color:var(--gray-2);">Лоскутная операция в области одного зуба</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 2 000 ₽</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 28px;"><span style="font-size:15px;color:var(--gray-2);">Шинирование зубов, за каждый зуб</span><span style="font-weight:700;color:var(--green);white-space:nowrap;margin-left:16px;">от 1 200 ₽</span></div>
+        </div>
+      </div>
+
+      <div class="reveal" style="text-align:center;padding:8px 0 16px;">
+        <button class="btn-primary" onclick="openModal()">Записаться на консультацию</button>
       </div>
     </div>
   </div>
@@ -1143,6 +1341,24 @@
 
 <script>
   // Promo popup — показывается через 2 сек, один раз за сессию
+  function toggleFullPrice() {
+    const list = document.getElementById('fullPriceList');
+    const btn = document.getElementById('priceToggleBtn');
+    const isOpen = list.style.display === 'block';
+    list.style.display = isOpen ? 'none' : 'block';
+    btn.textContent = isOpen ? 'Смотреть полный прайс ↓' : 'Свернуть ↑';
+    if (!isOpen) setTimeout(() => list.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  }
+  function showPriceTab(id, btn) {
+    document.querySelectorAll('.ptab-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.ptab').forEach(el => el.classList.remove('active'));
+    const tab = document.getElementById('tab-' + id);
+    tab.style.display = 'block';
+    tab.style.animation = 'none';
+    tab.offsetHeight; // reflow
+    tab.style.animation = 'fadeIn .3s ease';
+    btn.classList.add('active');
+  }
   function closePromo() {
     document.getElementById('promoPopup').classList.remove('open');
     document.body.style.overflow = '';
